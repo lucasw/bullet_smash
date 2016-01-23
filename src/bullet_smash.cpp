@@ -3,8 +3,10 @@
   g++ bullet_smash.cpp -lopencv_imgproc -lopencv_highgui -lopencv_core && ./a.out
 */
 
+#include <keyboard/Key.h>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <ros/ros.h>
 
 class Player
 {
@@ -12,6 +14,10 @@ class Player
   cv::Point vel_;
   cv::Size size_;
   bool on_ground_;
+
+
+  ros::Subscriber key_sub_;
+  void keyCallback(const keyboard::Key::ConstPtr& msg);
 
 public:
   Player(const cv::Point start_pos);
@@ -30,7 +36,14 @@ Player::Player(const cv::Point start_pos) :
     size_(16, 16),
     on_ground_(false)
 {
+  // key_sub_ = nh_.subscribe<keyboard::Key>("/keyboard/keydown", 1,
+  //     &Player::keyCallback, this);
+}
 
+void Player::keyCallback(const keyboard::Key::ConstPtr& msg)
+{
+  std::cout << "test" << msg->code << std::endl;
+  ROS_INFO_STREAM(msg->code);
 }
 
 void Player::update()
@@ -105,14 +118,27 @@ void Player::move(cv::Point dxy)
   pos_ += dxy;
 }
 
-int main(int argn, char** argv)
+void keyCallback(const keyboard::Key::ConstPtr& msg)
 {
+  std::cout << "test" << msg->code << std::endl;
+  ROS_INFO_STREAM(msg->code);
+}
+
+int main(int argc, char** argv)
+{
+  ros::init(argc, argv, "bullet_smash");
+
   cv::Mat background(cv::Size(1000, 700), CV_8UC3, cv::Scalar(255, 255, 105));
 
   Player player(cv::Point(16, 16));
 
-  bool do_loop = true;
-  while (do_loop)
+  ros::NodeHandle nh_;
+  ros::Subscriber key_sub_ = nh_.subscribe<keyboard::Key>("/keyboard/keydown", 1,
+      keyCallback);
+
+  ros::Rate rate(10);
+
+  while (ros::ok())
   {
     cv::Mat screen = background.clone();
     player.update();
@@ -120,7 +146,8 @@ int main(int argn, char** argv)
 
     cv::imshow("bullet_smash", screen);
 
-    int key = cv::waitKey(50);
+    int key = 0;
+    //int key = cv::waitKey(50);
     if (key == 'a')
     {
       player.walk(-3);
@@ -133,6 +160,9 @@ int main(int argn, char** argv)
     {
       player.jump();
     }
+
+    ros::Duration(0.5).sleep();
+    // rate.sleep();
   }
 }
 
