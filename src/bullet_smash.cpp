@@ -15,6 +15,7 @@ class Player
   cv::Size size_;
   bool on_ground_;
 
+  ros::NodeHandle nh_;
 
   ros::Subscriber key_sub_;
   void keyCallback(const keyboard::Key::ConstPtr& msg);
@@ -36,8 +37,8 @@ Player::Player(const cv::Point start_pos) :
     size_(16, 16),
     on_ground_(false)
 {
-  // key_sub_ = nh_.subscribe<keyboard::Key>("/keyboard/keydown", 1,
-  //     &Player::keyCallback, this);
+  key_sub_ = nh_.subscribe<keyboard::Key>("/keyboard/keydown", 1,
+      &Player::keyCallback, this);
 }
 
 void Player::keyCallback(const keyboard::Key::ConstPtr& msg)
@@ -132,9 +133,11 @@ int main(int argc, char** argv)
 
   Player player(cv::Point(16, 16));
 
-  ros::NodeHandle nh_;
-  ros::Subscriber key_sub_ = nh_.subscribe<keyboard::Key>("/keyboard/keydown", 1,
-      keyCallback);
+  // ros::NodeHandle nh_;
+  // ros::Subscriber key_sub_ = nh_.subscribe<keyboard::Key>("/keyboard/keydown", 1,
+  //    keyCallback);
+
+  ros::spin();
 
   ros::Rate rate(10);
 
