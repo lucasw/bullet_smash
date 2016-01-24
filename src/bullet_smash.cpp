@@ -121,7 +121,6 @@ void Player::move(cv::Point dxy)
 
 void keyCallback(const keyboard::Key::ConstPtr& msg)
 {
-  std::cout << "test" << msg->code << std::endl;
   ROS_INFO_STREAM(msg->code);
 }
 
@@ -132,10 +131,6 @@ int main(int argc, char** argv)
   cv::Mat background(cv::Size(1000, 700), CV_8UC3, cv::Scalar(255, 255, 105));
 
   Player player(cv::Point(16, 16));
-
-  // ros::NodeHandle nh_;
-  // ros::Subscriber key_sub_ = nh_.subscribe<keyboard::Key>("/keyboard/keydown", 1,
-  //    keyCallback);
 
   ros::spin();
 
@@ -149,8 +144,10 @@ int main(int argc, char** argv)
 
     cv::imshow("bullet_smash", screen);
 
-    int key = 0;
-    //int key = cv::waitKey(50);
+    // int key = 0;
+    int key = cv::waitKey(5);
+    ROS_INFO_STREAM(char(key));
+    #if 0
     if (key == 'a')
     {
       player.walk(-3);
@@ -163,9 +160,10 @@ int main(int argc, char** argv)
     {
       player.jump();
     }
+    #endif
 
-    ros::Duration(0.5).sleep();
-    // rate.sleep();
+    // ros::Duration(0.5).sleep();
+    rate.sleep();
   }
 }
 
