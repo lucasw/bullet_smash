@@ -5,5 +5,6 @@
   </node>
   <node name="bullet_smash" pkg="bullet_smash" type="bullet_smash" 
       output="screen" >
+    <param name="level_mask" value="$(find bullet_smash)/data/level1_mask.png" />
   </node>
 </launch>

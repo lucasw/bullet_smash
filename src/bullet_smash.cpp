@@ -28,7 +28,7 @@ class Player
 public:
   Player(const cv::Point2f start_pos);
 
-  void update();
+  void update(const cv::Mat mask);
   void move(const cv::Point2f dxy);
   void accel(const cv::Point2f dxy);
   void walk(const float vel);
@@ -67,11 +67,11 @@ void Player::keyCallback(const keyboard::Key::ConstPtr& msg,
   {
     jump_input_ = down_not_up;
   }
-  ROS_INFO_STREAM(key << " " << down_not_up << " " << left_input_ << " "
-      << right_input_ << " " << jump_input_);
+  // ROS_INFO_STREAM(key << " " << down_not_up << " " << left_input_ << " "
+  //     << right_input_ << " " << jump_input_);
 }
 
-void Player::update()
+void Player::update(const cv::Mat mask)
 {
   float left_right_move_amount = 3;
   if (left_input_)
@@ -87,7 +87,7 @@ void Player::update()
     jump();
   }
 
-  cv::Point2f gravity = cv::Point(0, -1.4);
+  cv::Point2f gravity = cv::Point(0, -1.6);
   vel_ += gravity;
   pos_ += vel_;
 
@@ -148,7 +148,7 @@ void Player::jump()
 {
   if (on_ground_ == true)
   {
-    accel(cv::Point(0, 15));
+    accel(cv::Point(0, 19));
   }
 }
 
@@ -165,12 +165,31 @@ int main(int argc, char** argv)
 
   Player player(cv::Point(16, 16));
 
+  std::string mask_file;
+  if (!ros::param::get("~level_mask", mask_file))
+  {
+    ROS_ERROR_STREAM("no level mask file");
+    return -1;
+  }
+  ROS_INFO_STREAM("level mask " << mask_file);
+  cv::Mat mask = cv::imread(mask_file, CV_LOAD_IMAGE_GRAYSCALE);
+  if (mask.empty())
+  {
+    ROS_ERROR_STREAM("could not load level mask file");
+    return -1;
+  }
+
+  // TODO(lwalter) make a level image to load and display instead of the mask
+  cv::Mat mask_bgr;
+  cv::cvtColor(mask, mask_bgr, CV_GRAY2BGR);
+  mask_bgr.copyTo(background, mask);
+
   ros::Rate rate(10);
 
   while (ros::ok())
   {
     cv::Mat screen = background.clone();
-    player.update();
+    player.update(mask);
     player.draw(screen);
 
     cv::imshow("bullet_smash", screen);
