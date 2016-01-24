@@ -10,64 +10,84 @@
 
 class Player
 {
-  cv::Point pos_;
-  cv::Point vel_;
+  cv::Point2f pos_;
+  cv::Point2f vel_;
   cv::Size size_;
   bool on_ground_;
 
   ros::NodeHandle nh_;
 
-  ros::Subscriber key_sub_;
-  void keyCallback(const keyboard::Key::ConstPtr& msg);
+  ros::Subscriber key_up_sub_;
+  ros::Subscriber key_down_sub_;
+  void keyCallback(const keyboard::Key::ConstPtr& msg, const bool down_not_up);
+
+  bool left_input_;
+  bool right_input_;
+  bool jump_input_;
 
 public:
-  Player(const cv::Point start_pos);
+  Player(const cv::Point2f start_pos);
 
   void update();
-  void move(cv::Point dxy);
-  void accel(cv::Point dxy);
+  void move(const cv::Point2f dxy);
+  void accel(const cv::Point2f dxy);
   void walk(const float vel);
   void jump();
   void draw(cv::Mat& screen);
 };
 
-Player::Player(const cv::Point start_pos) :
+Player::Player(const cv::Point2f start_pos) :
     pos_(start_pos),
-    vel_(0, 0),
+    vel_(0.0, 0.0),
     size_(16, 16),
-    on_ground_(false)
+    on_ground_(false),
+    left_input_(false),
+    right_input_(false),
+    jump_input_(false)
 {
-  key_sub_ = nh_.subscribe<keyboard::Key>("/keyboard/keydown", 1,
-      &Player::keyCallback, this);
+  key_down_sub_ = nh_.subscribe<keyboard::Key>("keyboard/keydown", 10,
+      boost::bind(&Player::keyCallback, this, _1, true));
+  key_up_sub_ = nh_.subscribe<keyboard::Key>("keyboard/keyup", 10,
+      boost::bind(&Player::keyCallback, this, _1, false));
 }
 
-void Player::keyCallback(const keyboard::Key::ConstPtr& msg)
+void Player::keyCallback(const keyboard::Key::ConstPtr& msg,
+    const bool down_not_up)
 {
   const int key = msg->code;
-
-  // int key = 0;
-  if (key > 0)
-    ROS_INFO_STREAM(char(key));
-
   if (key == keyboard::Key::KEY_a)
   {
-    walk(-3);
+    left_input_ = down_not_up;
   }
   if (key == keyboard::Key::KEY_d)
   {
-    walk(3);
+    right_input_ = down_not_up;
   }
   if (key == keyboard::Key::KEY_w)
   {
-    jump();
+    jump_input_ = down_not_up;
   }
-
-
+  ROS_INFO_STREAM(key << " " << down_not_up << " " << left_input_ << " "
+      << right_input_ << " " << jump_input_);
 }
 
 void Player::update()
 {
-  cv::Point gravity = cv::Point(0, -1);
+  float left_right_move_amount = 3;
+  if (left_input_)
+  {
+    walk(-left_right_move_amount);
+  }
+  if (right_input_)
+  {
+    walk(left_right_move_amount);
+  }
+  if (jump_input_)
+  {
+    jump();
+  }
+
+  cv::Point2f gravity = cv::Point(0, -1.4);
   vel_ += gravity;
   pos_ += vel_;
 
@@ -111,7 +131,7 @@ void Player::draw(cv::Mat& screen)
       cv::Scalar(128, 128, 128), CV_FILLED);
 }
 
-void Player::accel(cv::Point dxy)
+void Player::accel(const cv::Point2f dxy)
 {
   vel_ += dxy;
 }
@@ -132,11 +152,10 @@ void Player::jump()
   }
 }
 
-void Player::move(cv::Point dxy)
+void Player::move(const cv::Point2f dxy)
 {
   pos_ += dxy;
 }
-
 
 int main(int argc, char** argv)
 {
