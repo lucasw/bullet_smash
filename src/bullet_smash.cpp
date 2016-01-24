@@ -43,8 +43,26 @@ Player::Player(const cv::Point start_pos) :
 
 void Player::keyCallback(const keyboard::Key::ConstPtr& msg)
 {
-  std::cout << "test" << msg->code << std::endl;
-  ROS_INFO_STREAM(msg->code);
+  const int key = msg->code;
+
+  // int key = 0;
+  if (key > 0)
+    ROS_INFO_STREAM(char(key));
+
+  if (key == keyboard::Key::KEY_a)
+  {
+    walk(-3);
+  }
+  if (key == keyboard::Key::KEY_d)
+  {
+    walk(3);
+  }
+  if (key == keyboard::Key::KEY_w)
+  {
+    jump();
+  }
+
+
 }
 
 void Player::update()
@@ -119,10 +137,6 @@ void Player::move(cv::Point dxy)
   pos_ += dxy;
 }
 
-void keyCallback(const keyboard::Key::ConstPtr& msg)
-{
-  ROS_INFO_STREAM(msg->code);
-}
 
 int main(int argc, char** argv)
 {
@@ -131,8 +145,6 @@ int main(int argc, char** argv)
   cv::Mat background(cv::Size(1000, 700), CV_8UC3, cv::Scalar(255, 255, 105));
 
   Player player(cv::Point(16, 16));
-
-  // ros::spin();
 
   ros::Rate rate(10);
 
@@ -143,23 +155,7 @@ int main(int argc, char** argv)
     player.draw(screen);
 
     cv::imshow("bullet_smash", screen);
-
-    // int key = 0;
-    int key = cv::waitKey(5);
-    if (key > 0)
-      ROS_INFO_STREAM(char(key));
-    if (key == 'a')
-    {
-      player.walk(-3);
-    }
-    if (key == 'd')
-    {
-      player.walk(3);
-    }
-    if (key == 'w')
-    {
-      player.jump();
-    }
+    cv::waitKey(5);
 
     ros::spinOnce();
     rate.sleep();
