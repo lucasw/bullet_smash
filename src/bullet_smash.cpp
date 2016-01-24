@@ -138,6 +138,7 @@ int main(int argc, char** argv)
 
   while (ros::ok())
   {
+    #if 0
     cv::Mat screen = background.clone();
     player.update();
     player.draw(screen);
@@ -146,8 +147,8 @@ int main(int argc, char** argv)
 
     // int key = 0;
     int key = cv::waitKey(5);
-    ROS_INFO_STREAM(char(key));
-    #if 0
+    if (key > 0)
+      ROS_INFO_STREAM(char(key));
     if (key == 'a')
     {
       player.walk(-3);
@@ -163,7 +164,7 @@ int main(int argc, char** argv)
     #endif
 
     // ros::Duration(0.5).sleep();
-    rate.sleep();
+    // rate.sleep();
   }
 }
 
