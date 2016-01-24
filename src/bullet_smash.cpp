@@ -132,13 +132,12 @@ int main(int argc, char** argv)
 
   Player player(cv::Point(16, 16));
 
-  ros::spin();
+  // ros::spin();
 
   ros::Rate rate(10);
 
   while (ros::ok())
   {
-    #if 0
     cv::Mat screen = background.clone();
     player.update();
     player.draw(screen);
@@ -161,10 +160,9 @@ int main(int argc, char** argv)
     {
       player.jump();
     }
-    #endif
 
-    // ros::Duration(0.5).sleep();
-    // rate.sleep();
+    ros::spinOnce();
+    rate.sleep();
   }
 }
 
