@@ -34,6 +34,7 @@ public:
   void walk(const float vel);
   void jump();
   void draw(cv::Mat& screen);
+  void draw(cv::Mat& screen, const cv::Point pos);
 };
 
 Player::Player(const cv::Point2f start_pos) :
@@ -87,15 +88,17 @@ void Player::update(const cv::Mat mask)
     jump();
   }
 
+
+  cv::Point2f new_pos = pos_;
   cv::Point2f gravity = cv::Point(0, -1.6);
   vel_ += gravity;
-  pos_ += vel_;
+  new_pos += vel_;
 
   const int ground = 16;
-  if (pos_.y < ground)
+  if (new_pos.y < ground)
   {
     on_ground_ = true;
-    pos_.y = ground;
+    new_pos.y = ground;
     vel_.y = 0;
   }
   else
@@ -103,32 +106,49 @@ void Player::update(const cv::Mat mask)
     on_ground_ = false;
   }
 
-  if (pos_.x < 0)
+  if (new_pos.x < 0)
   {
     vel_.x = 0;
-    pos_.x = 0;
+    new_pos.x = 0;
   }
-  const int width = 700;
-  if (pos_.x > width)
+  if (new_pos.x > mask.cols)
   {
     vel_.x = 0;
-    pos_.x = width;
+    new_pos.x = mask.cols;
   }
 
   // air resistance
   vel_ *= 0.95;
 
   // ground friction
-  if (on_ground_)
-    vel_.x *= 0.8;
+  // if (on_ground_)
+  //  vel_.x *= 0.8;
+
+  // collision detection
+  cv::Mat player_mask = mask.clone();
+  player_mask = cv::Scalar::all(0);
+  draw(player_mask, new_pos);
+  if (cv::countNonZero(player_mask & mask) > 0)
+  {
+    vel_ *= 0.2;
+  }
+
+  pos_ = new_pos;
 }
 
-void Player::draw(cv::Mat& screen)
+
+void Player::draw(cv::Mat& screen, const cv::Point pos)
 {
-  cv::Point screen_pos = pos_;
+  cv::Point screen_pos = pos;
   screen_pos.y = screen.rows - pos_.y;
   cv::rectangle(screen, screen_pos, screen_pos + cv::Point(size_),
       cv::Scalar(128, 128, 128), CV_FILLED);
+}
+
+
+void Player::draw(cv::Mat& screen)
+{
+  draw(screen, pos_);
 }
 
 void Player::accel(const cv::Point2f dxy)
