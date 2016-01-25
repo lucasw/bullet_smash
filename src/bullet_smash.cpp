@@ -1,6 +1,5 @@
 /**
-
-  g++ bullet_smash.cpp -lopencv_imgproc -lopencv_highgui -lopencv_core && ./a.out
+  Copyright Lucas Walter 2016
 */
 
 #include <keyboard/Key.h>
@@ -72,6 +71,11 @@ void Player::keyCallback(const keyboard::Key::ConstPtr& msg,
   //     << right_input_ << " " << jump_input_);
 }
 
+bool testCollision(const cv::Point2f pt, const cv::Mat mask)
+{
+  return mask.at<uchar>(pt.y, pt.x) != 0;
+}
+
 void Player::update(const cv::Mat mask)
 {
   float left_right_move_amount = 3;
@@ -90,20 +94,42 @@ void Player::update(const cv::Mat mask)
 
 
   cv::Point2f new_pos = pos_;
-  cv::Point2f gravity = cv::Point(0, -1.6);
+  cv::Point2f gravity = cv::Point(0, 1.6);
   vel_ += gravity;
-  new_pos += vel_;
+  cv::Point2f vel_x(vel_.x, 0);
+  cv::Point2f vel_y(0, vel_.y);
 
-  const int ground = 16;
-  if (new_pos.y < ground)
+  bool downward_vertical_collision = false;
+  if ((vel_.y > 0) &&
+      (testCollision(pos_ + vel_y + cv::Point2f(0, size_.height), mask)))
+  {
+      downward_vertical_collision = true;
+  }
+
+  if ((vel_.y < 0) &&
+      (testCollision(pos_ + vel_y, mask)))
+  {
+    vel_.y = 0;
+  }
+
+  const int ground = mask.rows - 16;
+  if ((new_pos.y > ground) or (downward_vertical_collision))
   {
     on_ground_ = true;
-    new_pos.y = ground;
+    // new_pos.y = ground;
     vel_.y = 0;
   }
   else
   {
     on_ground_ = false;
+  }
+
+  new_pos += vel_;
+
+  if (new_pos.y < 0)
+  {
+    vel_.y = 0;
+    new_pos.y = 0;
   }
 
   if (new_pos.x < 0)
@@ -120,18 +146,29 @@ void Player::update(const cv::Mat mask)
   // air resistance
   vel_ *= 0.95;
 
+
   // ground friction
   // if (on_ground_)
   //  vel_.x *= 0.8;
 
   // collision detection
+  #if 0
   cv::Mat player_mask = mask.clone();
   player_mask = cv::Scalar::all(0);
-  draw(player_mask, new_pos);
-  if (cv::countNonZero(player_mask & mask) > 0)
+  // TODO(lucasw) later have to draw a line between pos_ and new pos
+  // to make sure the player didn't pass through something entirely
+  //draw(player_mask, new_pos);
+  cv::Point offset(8, 8);
+  cv::Point screen_pos = pos_;
+  cv::Point screen_new_pos = new_pos;
+  cv::line(player_mask, screen_pos + offset, screen_new_pos + offset, cv::Scalar::all(255), 16);
+  cv::Mat overlap = player_mask & mask;
+  if (cv::countNonZero(overlap) > 0)
   {
-    vel_ *= 0.2;
+    cv::Rect bounds = cv::boundingRect(overlap);
+    if (bounds.y
   }
+  #endif
 
   pos_ = new_pos;
 }
@@ -140,7 +177,7 @@ void Player::update(const cv::Mat mask)
 void Player::draw(cv::Mat& screen, const cv::Point pos)
 {
   cv::Point screen_pos = pos;
-  screen_pos.y = screen.rows - pos_.y;
+  // screen_pos.y = screen.rows - pos_.y;
   cv::rectangle(screen, screen_pos, screen_pos + cv::Point(size_),
       cv::Scalar(128, 128, 128), CV_FILLED);
 }
@@ -168,7 +205,7 @@ void Player::jump()
 {
   if (on_ground_ == true)
   {
-    accel(cv::Point(0, 19));
+    accel(cv::Point(0, -19));
   }
 }
 
