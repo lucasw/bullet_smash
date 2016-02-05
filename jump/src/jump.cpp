@@ -216,11 +216,11 @@ void Player::move(const cv::Point2f dxy)
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "bullet_smash");
+  ros::init(argc, argv, "jump");
 
   cv::Mat background(cv::Size(1000, 700), CV_8UC3, cv::Scalar(255, 255, 105));
 
-  Player player(cv::Point(16, 16));
+  Player player(cv::Point(16, background.rows - 30));
 
   std::string mask_file;
   if (!ros::param::get("~level_mask", mask_file))
@@ -249,7 +249,7 @@ int main(int argc, char** argv)
     player.update(mask);
     player.draw(screen);
 
-    cv::imshow("bullet_smash", screen);
+    cv::imshow("jump", screen);
     cv::waitKey(5);
 
     ros::spinOnce();

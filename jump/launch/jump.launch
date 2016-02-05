@@ -3,8 +3,8 @@
   <node name="keyboard" pkg="keyboard" type="keyboard" 
       output="screen" >
   </node>
-  <node name="bullet_smash" pkg="bullet_smash" type="bullet_smash" 
+  <node name="jump" pkg="jump" type="jump" 
       output="screen" >
-    <param name="level_mask" value="$(find bullet_smash)/data/level1_mask.png" />
+    <param name="level_mask" value="$(find jump)/data/level2_mask.png" />
   </node>
 </launch>

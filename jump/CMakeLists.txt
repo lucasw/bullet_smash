@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(bullet_smash)
+project(jump)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -91,7 +91,7 @@ roslint_cpp()
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-  LIBRARIES bullet_smash
+  LIBRARIES jump
   CATKIN_DEPENDS roscpp sensor_msgs std_msgs
 #  DEPENDS system_lib
 )
@@ -108,33 +108,33 @@ include_directories(
 )
 
 ## Declare a cpp library
-# add_library(bullet_smash
+# add_library(jump
 #   src/screengrab_ros_node.cpp
 # )
 
 # Declare a cpp executable
-add_executable(bullet_smash src/bullet_smash.cpp)
+add_executable(jump src/jump.cpp)
 
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-# add_dependencies(bullet_smash bullet_smash_generate_messages_cpp)
-# add_dependencies(bullet_smash ${PROJECT_NAME}_gencfg)
+# add_dependencies(jump jump_generate_messages_cpp)
+# add_dependencies(jump ${PROJECT_NAME}_gencfg)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(bullet_smash
+target_link_libraries(jump
    ${catkin_LIBRARIES}
 )
 if(catkin_EXPORTED_LIBRARIES)
-  add_dependencies(bullet_smash ${catkin_EXPORTED_LIBRARIES})
+  add_dependencies(jump ${catkin_EXPORTED_LIBRARIES})
 endif()
 
 
-# add_library(bullet_smash
-#   src/bullet_smash.cpp
+# add_library(jump
+#   src/jump.cpp
 # )
 
-target_link_libraries(bullet_smash
+target_link_libraries(jump
    ${catkin_LIBRARIES}
 )
 
@@ -154,7 +154,7 @@ target_link_libraries(bullet_smash
 
 ## Mark executables and/or libraries for installation
 install(TARGETS
-  bullet_smash
+  jump
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
