@@ -33,8 +33,8 @@ class Enemy:
         self.br.sendTransform((self.x, self.y, self.z),
                               (0, 0, 0, 1.0),
                               rospy.Time.now(),
-                              "map",
-                              self.link)
+                              self.link,
+                              "map")
 if __name__ == '__main__':
     rospy.init_node('enemy')
     enemy = Enemy()
