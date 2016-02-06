@@ -7,7 +7,7 @@
 import rospy
 import tf
 
-from visualization_msgs.msg import Marker
+from visualization_msgs.msg import Marker, MarkerArray
 
 class Enemy:
     def __init__(self):
@@ -19,14 +19,35 @@ class Enemy:
         self.link = name.replace(namespace, "", 1)
         rospy.loginfo("link \"" + self.link + "\"")
 
-        self.marker = Marker()
-        self.marker.header.frame_id = self.link
-        self.marker.type = self.marker.CUBE
-        self.marker.scale.x = 0.8
-        self.marker.scale.y = 0.8
-        self.marker.scale.z = 0.8
-        self.marker.color.a = 1.0
-        self.marker_pub = rospy.Publisher("marker", Marker, queue_size = 1)
+        self.marker_array = MarkerArray()
+
+        # base black cube
+        marker = Marker()
+        marker.header.frame_id = self.link
+        marker.type = marker.CUBE
+        marker.id = 0
+        marker.scale.x = 0.7
+        marker.scale.y = 0.7
+        marker.scale.z = 0.7
+        marker.color.a = 1.0
+        self.marker_array.markers.append(marker)
+
+        # white on black
+        marker = Marker()
+        marker.header.frame_id = self.link
+        marker.type = marker.CUBE
+        marker.id = 1
+        marker.scale.x = 0.6
+        marker.scale.y = 0.6
+        marker.scale.z = 0.1
+        marker.color.a = 1.0
+        marker.color.r = 255
+        marker.color.g = 255
+        marker.color.b = 255
+        marker.pose.position.z = 1.0
+        self.marker_array.markers.append(marker)
+
+        self.marker_pub = rospy.Publisher("marker_array", MarkerArray, queue_size = 1)
 
         # how fast the unit advances
         self.seconds_per_square = rospy.get_param("seconds_per_square", 6)
@@ -51,7 +72,7 @@ class Enemy:
                               self.link,
                               "map")
         # TODO(lucasw) Do I need to keep publishing this over and over?
-        self.marker_pub.publish(self.marker)
+        self.marker_pub.publish(self.marker_array)
 if __name__ == '__main__':
     rospy.init_node('enemy')
     enemy = Enemy()

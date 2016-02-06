@@ -3,7 +3,9 @@ Panels:
     Help Height: 97
     Name: Displays
     Property Tree Widget:
-      Expanded: ~
+      Expanded:
+        - /Grid1
+        - /Grid2
       Splitter Ratio: 0.580537
     Tree Height: 286
   - Class: rviz/Selection
@@ -39,7 +41,7 @@ Visualization Manager:
       Name: Grid
       Normal Cell Count: 0
       Offset:
-        X: -2.5
+        X: 0
         Y: 0
         Z: -0.2
       Plane: XY
@@ -57,7 +59,7 @@ Visualization Manager:
       Name: Grid
       Normal Cell Count: 0
       Offset:
-        X: 2.5
+        X: 5
         Y: 0
         Z: -0.2
       Plane: XY
@@ -82,6 +84,14 @@ Visualization Manager:
       Enabled: true
       Marker Topic: /marker
       Name: Marker
+      Namespaces:
+        "": true
+      Queue Size: 100
+      Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /marker_array
+      Name: MarkerArray
       Namespaces:
         "": true
       Queue Size: 100
@@ -118,11 +128,11 @@ Visualization Manager:
         Value: false
       Name: Current View
       Near Clip Distance: 0.01
-      Scale: 45.4029
+      Scale: 81.33
       Target Frame: <Fixed Frame>
       Value: TopDownOrtho (rviz)
-      X: -0.06317
-      Y: 0.376115
+      X: 2.5
+      Y: 0
     Saved: ~
 Window Geometry:
   Displays:
