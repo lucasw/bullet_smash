@@ -3,11 +3,7 @@ Panels:
     Help Height: 97
     Name: Displays
     Property Tree Widget:
-      Expanded:
-        - /Global Options1
-        - /Status1
-        - /Grid1
-        - /Grid2
+      Expanded: ~
       Splitter Ratio: 0.580537
     Tree Height: 286
   - Class: rviz/Selection
@@ -69,32 +65,26 @@ Visualization Manager:
       Reference Frame: <Fixed Frame>
       Value: true
     - Class: rviz/TF
-      Enabled: true
+      Enabled: false
       Frame Timeout: 15
       Frames:
         All Enabled: true
-        map:
-          Value: true
-        t1:
-          Value: true
-        t2:
-          Value: true
-        t3:
-          Value: true
       Marker Scale: 1
       Name: TF
       Show Arrows: true
       Show Axes: true
       Show Names: true
       Tree:
-        map:
-          t1:
-            {}
-          t2:
-            {}
-          t3:
-            {}
+        {}
       Update Interval: 0
+      Value: false
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /marker
+      Name: Marker
+      Namespaces:
+        "": true
+      Queue Size: 100
       Value: true
   Enabled: true
   Global Options:
@@ -128,7 +118,7 @@ Visualization Manager:
         Value: false
       Name: Current View
       Near Clip Distance: 0.01
-      Scale: 82.2733
+      Scale: 45.4029
       Target Frame: <Fixed Frame>
       Value: TopDownOrtho (rviz)
       X: -0.06317
