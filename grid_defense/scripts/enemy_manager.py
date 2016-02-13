@@ -6,6 +6,7 @@ import rospy
 
 class EnemyManager:
     def __init__(self):
+        rospy.init_node("enemy_manager")
         self.ns = rospy.get_namespace()
 
         self.launch = roslaunch.scriptapi.ROSLaunch()

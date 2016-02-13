@@ -28,10 +28,12 @@ class Enemy:
         marker.header.frame_id = self.link
         marker.type = marker.CUBE
         marker.id = 0
-        marker.scale.x = 0.7
-        marker.scale.y = 0.7
-        marker.scale.z = 0.7
+        marker.ns = self.name
+        marker.scale.x = 0.6
+        marker.scale.y = 0.6
+        marker.scale.z = 0.6
         marker.color.a = 1.0
+        marker.frame_locked = True
         self.marker_array.markers.append(marker)
 
         # white on black
@@ -39,20 +41,22 @@ class Enemy:
         marker.header.frame_id = self.link
         marker.type = marker.CUBE
         marker.id = 1
-        marker.scale.x = 0.6
-        marker.scale.y = 0.6
+        marker.ns = self.name
+        marker.scale.x = 0.5
+        marker.scale.y = 0.5
         marker.scale.z = 0.1
         marker.color.a = 1.0
         marker.color.r = 255
         marker.color.g = 255
         marker.color.b = 255
         marker.pose.position.z = 1.0
+        marker.frame_locked = True
         self.marker_array.markers.append(marker)
 
         self.marker_pub = rospy.Publisher("marker_array", MarkerArray, queue_size=1)
 
         # how fast the unit advances
-        self.seconds_per_square = rospy.get_param("seconds_per_square", 6)
+        self.seconds_per_square = rospy.get_param("seconds_per_square", 10)
         self.vel = -1.0 / self.seconds_per_square
 
         self.init_x = rospy.get_param("~x", 10)
@@ -69,6 +73,9 @@ class Enemy:
 
         self.damage_sub = rospy.Subscriber(self.name + "/damage",
                                            Float32, self.damage, queue_size=1)
+
+        rospy.sleep(0.5)
+        self.marker_pub.publish(self.marker_array)
 
     def damage(self, msg):
         self.hit_points -= msg.data
@@ -89,7 +96,7 @@ class Enemy:
                               self.link,
                               "map")
         # TODO(lucasw) Do I need to keep publishing this over and over?
-        self.marker_pub.publish(self.marker_array)
+        # self.marker_pub.publish(self.marker_array)
 
 
 if __name__ == '__main__':
