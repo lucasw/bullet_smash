@@ -11,7 +11,8 @@ from std_msgs.msg import Float32
 from visualization_msgs.msg import Marker, MarkerArray
 
 
-class Enemy:
+# TODO(lucasw) make this inherit from a base class
+class Projectile:
     def __init__(self):
         self.br = tf.TransformBroadcaster()
 
@@ -23,6 +24,7 @@ class Enemy:
 
         self.marker_array = MarkerArray()
 
+        scale = 0.2
         # TODO(lucasw) make these a mesh instead
         # base black cube
         marker = Marker()
@@ -30,9 +32,9 @@ class Enemy:
         marker.type = marker.CUBE
         marker.id = 0
         marker.ns = self.name
-        marker.scale.x = 0.6
-        marker.scale.y = 0.6
-        marker.scale.z = 0.6
+        marker.scale.x = scale
+        marker.scale.y = scale
+        marker.scale.z = scale
         marker.color.a = 1.0
         marker.frame_locked = True
         # self.marker_array.markers.append(marker)
@@ -43,8 +45,8 @@ class Enemy:
         marker2.type = marker.CUBE
         marker2.id = 1
         marker2.ns = self.name
-        marker2.scale.x = 0.5
-        marker2.scale.y = 0.5
+        marker2.scale.x = scale - 0.1
+        marker2.scale.y = scale - 0.1
         marker2.scale.z = 0.1
         marker2.color.a = 1.0
         marker2.color.r = 255
@@ -55,12 +57,12 @@ class Enemy:
         # self.marker_array.markers.append(marker2)
 
         # energy
+        self.energy_bar_orig_length = scale - 0.1
         self.energy_bar = Marker()
         self.energy_bar.header.frame_id = self.link
         self.energy_bar.type = self.energy_bar.CUBE
         self.energy_bar.id = 2
         self.energy_bar.ns = self.name
-        self.energy_bar_orig_length = 0.5
         self.energy_bar.scale.x = self.energy_bar_orig_length
         self.energy_bar.scale.y = 0.1
         self.energy_bar.scale.z = 0.1
@@ -76,10 +78,10 @@ class Enemy:
         self.marker_pub = rospy.Publisher("/marker", Marker, queue_size=4)
 
         # how fast the unit advances
-        self.seconds_per_square = rospy.get_param("seconds_per_square", 10)
-        self.vel = -1.0 / self.seconds_per_square
+        self.seconds_per_square = rospy.get_param("seconds_per_square", 3)
+        self.vel = 1.0 / self.seconds_per_square
 
-        self.init_x = rospy.get_param("~x", 10)
+        self.init_x = rospy.get_param("~x", 0)
         self.x = self.init_x
         self.init_y = rospy.get_param("~y", 1)
         self.y = self.init_y
@@ -87,7 +89,7 @@ class Enemy:
 
         self.dt = 0.05
 
-        self.hit_points_orig = 100.0
+        self.hit_points_orig = 10.0
         self.hit_points = self.hit_points_orig
 
         self.update_timer = rospy.Timer(rospy.Duration(self.dt), self.update)
@@ -118,18 +120,19 @@ class Enemy:
 
     def update(self, event):
         self.x += self.vel * self.dt
-        if self.x < 0:
-            self.x = self.init_x
         self.br.sendTransform((self.x, self.y, self.z),
                               (0, 0, 0, 1.0),
                               rospy.Time.now(),
                               self.link,
                               "map")
-
+        if self.x > 10:
+            msg = "this unit is off screen"
+            rospy.loginfo(msg)
+            rospy.signal_shutdown(msg)
 
 if __name__ == '__main__':
-    rospy.init_node('enemy')
-    enemy = Enemy()
+    rospy.init_node('projectile')
+    projectile = Projectile()
     # while not rospy.is_shutdown():
     #    rospy.sleep(0.5)
     rospy.spin()
