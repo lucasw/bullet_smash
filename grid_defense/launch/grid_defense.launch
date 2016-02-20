@@ -2,6 +2,6 @@
 <launch>
 
 
-  <node name="rviz1" pkg="rviz" type="rviz" args="-d $(find grid_defense)/launch/grid_defense.rviz" />
+  <node name="rviz1" pkg="rviz" type="rviz" args="-d $(find grid_defense)/config/grid_defense.rviz" />
 
 </launch>
