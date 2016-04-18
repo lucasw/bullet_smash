@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<launch>
+
+  <param name="/use_sim_time" value="true" />
+
+  <node name="game_manager" pkg="adventure" type="game_manager.py"
+      output="screen" >
+  </node>
+
+  <node name="player" pkg="adventure" type="player.py"
+      output="screen" ns="player" >
+  </node>
+
+  <node name="keyboard" pkg="keyboard" type="keyboard"
+      output="screen" >
+  </node>
+
+</launch>
